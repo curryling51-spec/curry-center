@@ -3103,73 +3103,6 @@ body:has(.admin-modal-backdrop) {
 .access-rule-editor {
   width: min(720px, 100%);
 }
-.source-backup-panel {
-  display: grid;
-  grid-template-columns: 56px minmax(0, 1fr) auto;
-  gap: 18px;
-  align-items: start;
-  padding: 22px;
-}
-
-.source-backup-icon {
-  display: grid;
-  width: 56px;
-  height: 56px;
-  place-items: center;
-  border-radius: 8px;
-  background: #e8f3ef;
-  color: #176b57;
-}
-
-.source-backup-copy h3 {
-  margin: 2px 0 5px;
-  font-size: 17px;
-}
-
-.source-backup-copy > p {
-  margin: 0;
-  color: #7c8883;
-  font-size: 13px;
-}
-
-.source-backup-copy dl {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px 28px;
-  margin: 18px 0 0;
-}
-
-.source-backup-copy dl div {
-  display: grid;
-  gap: 3px;
-}
-
-.source-backup-copy dt {
-  color: #89948f;
-  font-size: 11px;
-}
-
-.source-backup-copy dd {
-  margin: 0;
-  color: #26332e;
-  font-size: 14px;
-  font-weight: 750;
-}
-
-.source-backup-actions .admin-primary-action {
-  gap: 7px;
-}
-
-.source-backup-panel > footer {
-  display: flex;
-  grid-column: 1 / -1;
-  gap: 8px;
-  align-items: center;
-  border-top: 1px solid #edf0ee;
-  color: #73807b;
-  font-size: 12px;
-  padding-top: 16px;
-}
 
 .admin-pattern-field {
   border: 1px solid #e1e6e4;
@@ -3857,24 +3790,6 @@ body:has(.admin-modal-backdrop) {
   .access-rule-editor {
     width: 100%;
     max-width: 100vw;
-  }
-  .source-backup-panel {
-    grid-template-columns: 44px minmax(0, 1fr);
-    padding: 16px;
-  }
-
-  .source-backup-icon {
-    width: 44px;
-    height: 44px;
-  }
-
-  .source-backup-actions,
-  .source-backup-actions .admin-primary-action {
-    width: 100%;
-  }
-
-  .source-backup-actions {
-    grid-column: 1 / -1;
   }
 
   .admin-pattern-field {

@@ -3,9 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "backup:source": "node scripts/create-source-backup.mjs",
     "build": "nuxt build",
-    "predeploy:prod": "npm run backup:source",
     "deploy:prod": "npx --yes --cache .npm-cache vercel@58.9.1 deploy --prod --yes --scope curry4",
     "dev": "nuxt dev",
     "generate": "nuxt generate",

@@ -11,6 +11,4 @@ dist
 
 .vercel
 .claude
-server/assets/source-backup.zip
-server/assets/source-backup.json
 .env*

@@ -49,7 +49,7 @@ npx --yes --cache .npm-cache vercel@58.9.1 env pull .env --environment=productio
 node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 ```
 
-`.env` 只在本机使用，不会进入源码备份。
+`.env` 只在本机使用，不会提交到代码仓库。
 
 ## 启动开发环境
 
@@ -78,8 +78,7 @@ http://localhost:9830/admin
 | `npm run test:watch` | 持续监听并运行测试 |
 | `npm run build` | 执行本地生产构建 |
 | `npm run preview` | 预览本地生产构建结果 |
-| `npm run backup:source` | 只生成源码 ZIP |
-| `npm run deploy:prod` | 生成源码 ZIP 并发布到 Vercel Production |
+| `npm run deploy:prod` | 发布到 Vercel Production |
 
 如果 `npm run dev` 正在运行并占用 `.nuxt/nuxt.lock`，不要同时执行 `npm run build`，也不要为了构建停止开发服务。正式上线会在 Vercel 隔离环境重新构建。
 
@@ -91,30 +90,7 @@ http://localhost:9830/admin
 npm run deploy:prod
 ```
 
-不要直接绕过这个命令调用 Vercel，否则可能不会更新线上源码备份。
-
-## 源码备份
-
-`npm run deploy:prod` 会先执行 `npm run backup:source`，生成：
-
-```text
-server/assets/source-backup.zip
-server/assets/source-backup.json
-```
-
-备份会随服务端一起部署，但不会作为公开静态文件暴露。只有超级管理员登录后台后，才能从“系统设置 → 源码备份”下载。
-
-备份不包含：
-
-```text
-.env
-.git
-node_modules
-.nuxt
-.output
-.vercel
-.npm-cache
-```
+不要直接绕过这个命令调用 Vercel，以保持发布方式一致。
 
 ## 前台访问验证
 

@@ -48,7 +48,7 @@ npx --yes --cache .npm-cache vercel@58.9.1 env add NUXT_SUPABASE_SECRET_KEY prod
 npx --yes --cache .npm-cache vercel@58.9.1 env add NUXT_SESSION_SECRET production --scope curry4
 ```
 
-每条命令会提示输入对应的值。Supabase secret key 和会话密钥不能写入 README、源码或源码备份。
+每条命令会提示输入对应的值。Supabase secret key 和会话密钥不能写入 README 或源码。
 
 检查 Production 变量名称：
 
@@ -107,12 +107,10 @@ npm run deploy:prod
 
 这条命令会自动完成：
 
-1. 执行 `npm run backup:source`。
-2. 生成不含密钥、依赖和构建产物的源码 ZIP。
-3. 上传项目到 Vercel。
-4. 在 Vercel 隔离环境运行 `npm run build`。
-5. 将成功构建的版本切换到 Production。
-6. 将正式域名指向最新部署。
+1. 上传项目到 Vercel。
+2. 在 Vercel 隔离环境运行 `npm run build`。
+3. 将成功构建的版本切换到 Production。
+4. 将正式域名指向最新部署。
 
 不要同时重复执行发布命令。等待终端出现：
 
@@ -129,7 +127,6 @@ Aliased https://curry-center.vercel.app
 https://curry-center.vercel.app
 https://curry-center.vercel.app/checkin
 https://curry-center.vercel.app/admin
-https://curry-center.vercel.app/admin/source-backup
 ```
 
 检查健康接口：
@@ -144,14 +141,10 @@ Invoke-RestMethod https://curry-center.vercel.app/api/health
 status: online
 ```
 
-登录超级管理员后进入“系统设置 → 源码备份”，确认生成时间是本次发布，并下载 ZIP 测试。
-
 ## 八、换电脑恢复项目
 
-1. 在已上线后台进入“系统设置 → 源码备份”。
-2. 使用超级管理员账号下载最新 ZIP。
-3. 将 ZIP 解压到新电脑的项目目录。
-4. 在解压后的目录执行：
+1. 从 GitHub 克隆 `curryling51-spec/curry-center`。
+2. 在项目目录执行：
 
 ```powershell
 npm install
@@ -168,5 +161,3 @@ Supabase 数据已经在云端，恢复源码后不需要导入数据库。以�
 - 出现 `nuxt.lock`：说明开发服务正在使用 Nuxt 缓存，跳过本地构建即可。
 - 找不到 Vercel 项目：重新执行 `vercel login` 和 `vercel link --scope curry4`。
 - 发布长时间没有结果：不要重复发布，先等待当前命令完成，再到 Vercel Deployments 查看状态。
-- 备份接口返回 `401`：需要先登录后台。
-- 普通管理员看不到源码备份：这是正常权限限制，只有 `super` 可以下载。

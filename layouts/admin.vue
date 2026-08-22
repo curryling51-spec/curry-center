@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {
-  Archive,
   BookOpen,
   ChevronDown,
   ClipboardList,
@@ -57,8 +56,7 @@ const allMenuGroups: AdminMenuGroup[] = [
     label: '系统设置',
     icon: Settings,
     items: [
-      { label: '访问验证', icon: ShieldCheck, to: '/admin/access', superOnly: true },
-      { label: '源码备份', icon: Archive, to: '/admin/source-backup', superOnly: true }
+      { label: '访问验证', icon: ShieldCheck, to: '/admin/access', superOnly: true }
     ]
   }
 ]
@@ -85,7 +83,6 @@ const pageTitle = computed(() => {
   if (route.path.startsWith('/admin/library/categories')) return '知识分类'
   if (route.path.startsWith('/admin/library/articles')) return '知识文章'
   if (route.path.startsWith('/admin/access')) return '访问验证'
-  if (route.path.startsWith('/admin/source-backup')) return '源码备份'
   return '概览'
 })
 const roleLabel = computed(() => user.value?.role === 'super' ? '超级管理员' : '管理员')

@@ -15,4 +15,4 @@
 - 部署时如果本地 Nuxt 开发服务正在运行或 `nuxt.lock` 被占用，不要重试本地构建，也不要停止用户的服务；直接使用 Vercel 的隔离生产构建。
 - Vercel CLI 使用固定版本和项目缓存：`npx --yes --cache .npm-cache vercel@58.9.1`。
 - Production 环境变量只在首次配置、配置变化或线上鉴权异常时检查，不要每次部署重复检查。
-- 发布命令：`npm run deploy:prod`。该命令会先生成最新源码备份，再调用固定版本的 Vercel CLI 发布。
+- 发布命令：`npm run deploy:prod`。该命令使用固定版本的 Vercel CLI 发布。

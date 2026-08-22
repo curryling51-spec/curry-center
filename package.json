@@ -1,0 +1,36 @@
+{
+  "name": "curry-center",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "backup:source": "node scripts/create-source-backup.mjs",
+    "build": "nuxt build",
+    "predeploy:prod": "npm run backup:source",
+    "deploy:prod": "npx --yes --cache .npm-cache vercel@58.9.1 deploy --prod --yes --scope curry4",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "postinstall": "nuxt prepare",
+    "preview": "nuxt preview",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run --configLoader runner",
+    "test:watch": "vitest --configLoader runner"
+  },
+  "dependencies": {
+    "@lucide/vue": "^1.31.0",
+    "@supabase/supabase-js": "^2.112.2",
+    "@vuepic/vue-datepicker": "^14.0.0",
+    "markdown-it": "15.0.0",
+    "nuxt": "^4.2.0",
+    "vue": "^3.5.0",
+    "vue-router": "^5.2.0"
+  },
+  "devDependencies": {
+    "@nuxt/eslint": "^1.17.0",
+    "@types/node": "^24.13.3",
+    "eslint": "^10.8.1",
+    "typescript": "^5.9.0",
+    "vitest": "^4.1.10",
+    "vue-tsc": "^3.3.9"
+  }
+}

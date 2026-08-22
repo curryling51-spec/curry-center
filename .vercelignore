@@ -1,0 +1,16 @@
+.git
+.github
+.claude
+.npm-cache
+.nuxt
+.output
+.vercel
+node_modules
+.env
+.env.*
+!.env.example
+AGENTS.md
+PROJECT_NOTES.md
+README.md
+!server/assets/source-backup.zip
+!server/assets/source-backup.json

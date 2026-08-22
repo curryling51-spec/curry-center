@@ -1,0 +1,16 @@
+.nuxt
+.output
+.vercel
+node_modules
+.npm-cache
+dist
+*.local
+.env
+.env.*
+!.env.example
+
+.vercel
+.claude
+server/assets/source-backup.zip
+server/assets/source-backup.json
+.env*

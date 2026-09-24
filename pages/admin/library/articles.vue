@@ -14,6 +14,24 @@ type Article = {
   category: Pick<Category, 'id' | 'name' | 'slug'> | null
 }
 
+type ArticleRevisionSummary = {
+  id: string
+  article_id: string
+  title: string
+  slug: string
+  status: 'draft' | 'published'
+  change_type: 'edit' | 'publish' | 'unpublish' | 'restore'
+  changed_by_username: string
+  created_at: string
+}
+
+type ArticleRevision = ArticleRevisionSummary & {
+  category_id: string
+  content_markdown: string
+  published_at: string | null
+  changed_by_user_id: string | null
+}
+
 definePageMeta({ layout: 'admin' })
 useHead({ title: '知识文章 - Curry 中心' })
 
@@ -32,12 +50,39 @@ const isLoading = ref(true)
 const isSaving = ref(false)
 const isUploading = ref(false)
 const isEditorOpen = ref(false)
+const isHistoryOpen = ref(false)
+const isHistoryLoading = ref(false)
+const isHistoryDetailLoading = ref(false)
+const isRestoring = ref(false)
 const errorMessage = ref('')
+const historyErrorMessage = ref('')
+const historyArticle = ref<Article | null>(null)
+const revisions = ref<ArticleRevisionSummary[]>([])
+const selectedRevisionId = ref<string | null>(null)
+const selectedRevision = ref<ArticleRevision | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
 const contentInput = ref<HTMLTextAreaElement | null>(null)
 const confirmDialog = useAdminConfirm()
 
 const publishedCount = computed(() => articles.value.filter(article => article.status === 'published').length)
+
+const historyActionLabel = (changeType: ArticleRevisionSummary['change_type']) => ({
+  edit: '编辑前',
+  publish: '发布前',
+  unpublish: '下架前',
+  restore: '恢复前'
+})[changeType]
+
+const formatDateTime = (value: string) => new Intl.DateTimeFormat('zh-CN', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit'
+}).format(new Date(value))
+
+const categoryName = (categoryId: string) =>
+  categories.value.find(category => category.id === categoryId)?.name || '原分类已删除'
 
 const loadData = async () => {
   isLoading.value = true
@@ -81,6 +126,76 @@ const openEdit = (article: Article) => {
 
 const closeEditor = () => {
   if (!isSaving.value && !isUploading.value) isEditorOpen.value = false
+}
+
+const selectRevision = async (revision: ArticleRevisionSummary) => {
+  if (!historyArticle.value || isHistoryDetailLoading.value && selectedRevisionId.value === revision.id) return
+  selectedRevisionId.value = revision.id
+  selectedRevision.value = null
+  isHistoryDetailLoading.value = true
+  historyErrorMessage.value = ''
+  try {
+    const detail = await $fetch<ArticleRevision>(
+      `/api/admin/knowledge/articles/${historyArticle.value.id}/history/${revision.id}`
+    )
+    if (selectedRevisionId.value === revision.id) selectedRevision.value = detail
+  } catch (error) {
+    historyErrorMessage.value = getErrorMessage(error, '历史版本读取失败。')
+  } finally {
+    if (selectedRevisionId.value === revision.id) isHistoryDetailLoading.value = false
+  }
+}
+
+const openHistory = async (article: Article) => {
+  historyArticle.value = article
+  revisions.value = []
+  selectedRevisionId.value = null
+  selectedRevision.value = null
+  historyErrorMessage.value = ''
+  isHistoryOpen.value = true
+  isHistoryLoading.value = true
+  try {
+    revisions.value = await $fetch<ArticleRevisionSummary[]>(
+      `/api/admin/knowledge/articles/${article.id}/history`
+    )
+    if (revisions.value[0]) await selectRevision(revisions.value[0])
+  } catch (error) {
+    historyErrorMessage.value = getErrorMessage(error, '文章历史读取失败。')
+  } finally {
+    isHistoryLoading.value = false
+  }
+}
+
+const closeHistory = () => {
+  if (!isRestoring.value) isHistoryOpen.value = false
+}
+
+const restoreRevision = () => {
+  const article = historyArticle.value
+  const revision = selectedRevision.value
+  if (!article || !revision || isRestoring.value) return
+
+  confirmDialog.request({
+    title: '恢复历史版本',
+    message: `确定把“${article.title}”恢复到 ${formatDateTime(revision.created_at)} 保存的版本吗？当前版本也会自动保留在历史中。`,
+    confirmLabel: '恢复此版本',
+    tone: 'primary'
+  }, async () => {
+    isRestoring.value = true
+    historyErrorMessage.value = ''
+    try {
+      await $fetch(
+        `/api/admin/knowledge/articles/${article.id}/history/${revision.id}/restore`,
+        { method: 'POST' }
+      )
+      isHistoryOpen.value = false
+      await loadData()
+    } catch (error) {
+      historyErrorMessage.value = getErrorMessage(error, '文章历史恢复失败。')
+    } finally {
+      isRestoring.value = false
+    }
+  })
 }
 
 const saveArticle = async () => {
@@ -210,6 +325,7 @@ onMounted(loadData)
           </div>
           <div class="plan-admin-actions">
             <NuxtLink v-if="article.status === 'published'" :to="`/library/article/${article.slug}`" target="_blank">查看</NuxtLink>
+            <button type="button" @click="openHistory(article)">历史</button>
             <button type="button" @click="openEdit(article)">编辑</button>
             <button type="button" @click="changeStatus(article)">{{ article.status === 'published' ? '下架' : '发布' }}</button>
             <button class="danger" type="button" @click="deleteArticle(article)">删除</button>
@@ -252,6 +368,92 @@ onMounted(loadData)
               <button class="admin-primary-action" type="submit" :disabled="isSaving || isUploading">{{ isSaving ? '保存中...' : '保存文章' }}</button>
             </footer>
           </form>
+        </section>
+      </div>
+    </Teleport>
+
+    <Teleport to="body">
+      <div v-if="isHistoryOpen" class="admin-modal-backdrop">
+        <section class="admin-modal article-history-modal" role="dialog" aria-modal="true" aria-label="文章历史">
+          <header>
+            <div>
+              <p>VERSION HISTORY</p>
+              <h2>{{ historyArticle?.title || '文章历史' }}</h2>
+            </div>
+            <button type="button" aria-label="关闭" title="关闭" @click="closeHistory">×</button>
+          </header>
+
+          <div class="article-history-layout">
+            <aside class="article-history-sidebar">
+              <div class="article-history-sidebar-head">
+                <strong>历史版本</strong>
+                <span>{{ revisions.length }} 条</span>
+              </div>
+
+              <LoadingSkeleton v-if="isHistoryLoading" :count="5" label="正在加载文章历史" />
+              <div v-else-if="!revisions.length" class="article-history-empty">
+                暂无历史版本<br />首次修改、发布或下架后会自动记录
+              </div>
+              <div v-else class="article-history-list">
+                <button
+                  v-for="revision in revisions"
+                  :key="revision.id"
+                  type="button"
+                  :class="{ active: selectedRevisionId === revision.id }"
+                  @click="selectRevision(revision)"
+                >
+                  <span>
+                    <strong>{{ historyActionLabel(revision.change_type) }}</strong>
+                    <i :class="{ published: revision.status === 'published' }">
+                      {{ revision.status === 'published' ? '已发布' : '草稿' }}
+                    </i>
+                  </span>
+                  <small>{{ formatDateTime(revision.created_at) }}</small>
+                  <em>{{ revision.changed_by_username }}</em>
+                </button>
+              </div>
+            </aside>
+
+            <main class="article-history-preview">
+              <LoadingSkeleton
+                v-if="isHistoryDetailLoading"
+                variant="list"
+                :count="5"
+                label="正在加载历史版本"
+              />
+              <div v-else-if="selectedRevision" class="article-history-document">
+                <div class="article-history-meta">
+                  <div>
+                    <span>{{ categoryName(selectedRevision.category_id) }}</span>
+                    <span>{{ selectedRevision.status === 'published' ? '已发布' : '草稿' }}</span>
+                    <code>/{{ selectedRevision.slug }}</code>
+                  </div>
+                  <button
+                    class="admin-primary-action"
+                    type="button"
+                    :disabled="isRestoring"
+                    @click="restoreRevision"
+                  >
+                    {{ isRestoring ? '恢复中...' : '恢复此版本' }}
+                  </button>
+                </div>
+                <h3>{{ selectedRevision.title }}</h3>
+                <p>
+                  {{ historyActionLabel(selectedRevision.change_type) }} ·
+                  {{ formatDateTime(selectedRevision.created_at) }} ·
+                  {{ selectedRevision.changed_by_username }}
+                </p>
+                <div class="article-history-content">
+                  <MarkdownContent :source="selectedRevision.content_markdown" />
+                </div>
+              </div>
+              <div v-else class="article-history-empty">选择左侧版本查看内容</div>
+
+              <p v-if="historyErrorMessage" class="admin-alert article-history-error">
+                {{ historyErrorMessage }}
+              </p>
+            </main>
+          </div>
         </section>
       </div>
     </Teleport>

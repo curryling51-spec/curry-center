@@ -9,7 +9,8 @@ import {
   ListTodo,
   Settings,
   ShieldCheck,
-  Tags
+  Tags,
+  Users
 } from '@lucide/vue'
 import type { Component } from 'vue'
 
@@ -56,6 +57,7 @@ const allMenuGroups: AdminMenuGroup[] = [
     label: '系统设置',
     icon: Settings,
     items: [
+      { label: '账号管理', icon: Users, to: '/admin/accounts', superOnly: true },
       { label: '访问验证', icon: ShieldCheck, to: '/admin/access', superOnly: true }
     ]
   }
@@ -82,6 +84,7 @@ const pageTitle = computed(() => {
   if (route.path === '/admin/food-orders') return '点菜记录'
   if (route.path.startsWith('/admin/library/categories')) return '知识分类'
   if (route.path.startsWith('/admin/library/articles')) return '知识文章'
+  if (route.path.startsWith('/admin/accounts')) return '账号管理'
   if (route.path.startsWith('/admin/access')) return '访问验证'
   return '概览'
 })

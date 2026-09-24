@@ -14,7 +14,8 @@ describe('POST /api/auth/login', () => {
     username: 'admin',
     password_hash: 'stored-hash',
     role: 'super',
-    is_active: true
+    is_active: true,
+    session_version: 0
   }
 
   beforeEach(() => {

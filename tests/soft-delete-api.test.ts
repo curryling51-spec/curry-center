@@ -11,7 +11,8 @@ const endpoints = [
   { name: '计划', table: 'plans', load: () => import('../server/api/admin/plans/[id].delete') },
   { name: '知识分类', table: 'knowledge_categories', load: () => import('../server/api/admin/knowledge/categories/[id].delete') },
   { name: '知识文章', table: 'knowledge_articles', load: () => import('../server/api/admin/knowledge/articles/[id].delete') },
-  { name: '访问规则', table: 'front_access_rules', load: () => import('../server/api/admin/access-rules/[id].delete') }
+  { name: '访问规则', table: 'front_access_rules', load: () => import('../server/api/admin/access-rules/[id].delete') },
+  { name: '后台账号', table: 'admin_users', load: () => import('../server/api/admin/accounts/[id].delete') }
 ]
 
 describe('business record soft deletion', () => {
@@ -20,7 +21,11 @@ describe('business record soft deletion', () => {
     vi.stubGlobal('defineEventHandler', (handler: DeleteHandler) => handler)
     vi.stubGlobal('createError', httpError)
     vi.stubGlobal('requireAuth', vi.fn(async () => undefined))
-    vi.stubGlobal('requireRole', vi.fn(async () => undefined))
+    vi.stubGlobal('requireRole', vi.fn(async () => ({
+      userId: '23c3d113-5d91-4cf8-82d1-8d8721b03373',
+      username: 'super',
+      role: 'super'
+    })))
     vi.stubGlobal('getRouterParam', () => recordId)
     vi.stubGlobal('isUuid', () => true)
     vi.stubGlobal('knowledgeDatabaseError', (error: Error) => { throw error })

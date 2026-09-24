@@ -19,6 +19,7 @@ export type AdminUserRow = {
   password_hash: string
   role: 'super' | 'admin'
   is_active: boolean
+  session_version: number
   last_login_at: string | null
   created_at: string
   updated_at: string
@@ -69,6 +70,21 @@ export type KnowledgeArticleRow = {
   created_at: string
   updated_at: string
   deleted_at: string | null
+}
+
+export type KnowledgeArticleRevisionRow = {
+  id: string
+  article_id: string
+  category_id: string
+  title: string
+  slug: string
+  content_markdown: string
+  status: 'draft' | 'published'
+  published_at: string | null
+  change_type: 'edit' | 'publish' | 'unpublish' | 'restore'
+  changed_by_user_id: string | null
+  changed_by_username: string
+  created_at: string
 }
 
 export type FrontAccessRuleRow = {
@@ -200,6 +216,15 @@ type Database = {
           deleted_at?: string | null
         }
         Update: Partial<Omit<KnowledgeArticleRow, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      knowledge_article_revisions: {
+        Row: KnowledgeArticleRevisionRow
+        Insert: Omit<KnowledgeArticleRevisionRow, 'id' | 'created_at'> & {
+          id?: string
+          created_at?: string
+        }
+        Update: Partial<Omit<KnowledgeArticleRevisionRow, 'id' | 'article_id' | 'created_at'>>
         Relationships: []
       }
       front_access_rules: {

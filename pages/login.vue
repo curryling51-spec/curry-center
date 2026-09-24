@@ -6,6 +6,10 @@ const password = ref('')
 const errorMessage = ref('')
 const isSubmitting = ref(false)
 
+const noticeMessage = computed(() =>
+  route.query.notice === 'password-updated' ? '密码已更新，请使用新密码重新登录。' : ''
+)
+
 useHead({
   title: '登录后台 - Curry 中心'
 })
@@ -43,6 +47,8 @@ onMounted(async () => {
     <NuxtLink class="back-link" to="/">返回首页</NuxtLink>
     <h1>登录后台</h1>
     <p>使用管理员账号进入 Curry 中心后台。</p>
+
+    <p v-if="noticeMessage" class="login-notice">{{ noticeMessage }}</p>
 
     <form class="recipe-form login-form" @submit.prevent="submit">
       <label>

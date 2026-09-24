@@ -12,6 +12,7 @@ export type SessionUser = {
 
 type SessionPayload = SessionUser & {
   expiresAt: number
+  sessionVersion: number
 }
 
 const sign = (secret: string, payload: string): string =>
@@ -26,11 +27,13 @@ const safeEqual = (a: string, b: string): boolean => {
 export const createSessionToken = (
   secret: string,
   user: SessionUser,
-  ttlMs = DEFAULT_TTL
+  ttlMs = DEFAULT_TTL,
+  sessionVersion = 0
 ): string => {
   const payload: SessionPayload = {
     ...user,
-    expiresAt: Date.now() + ttlMs
+    expiresAt: Date.now() + ttlMs,
+    sessionVersion
   }
   const encodedPayload = Buffer.from(JSON.stringify(payload)).toString('base64url')
   return `${encodedPayload}.${sign(secret, encodedPayload)}`
@@ -52,17 +55,22 @@ export const verifySessionToken = (
       Buffer.from(encodedPayload, 'base64url').toString('utf8')
     ) as Partial<SessionPayload>
 
+    const sessionVersion = payload.sessionVersion === undefined ? 0 : payload.sessionVersion
+
     if (
       typeof payload.userId !== 'string' ||
       typeof payload.username !== 'string' ||
       (payload.role !== 'super' && payload.role !== 'admin') ||
       typeof payload.expiresAt !== 'number' ||
+      typeof sessionVersion !== 'number' ||
+      !Number.isInteger(sessionVersion) ||
+      sessionVersion < 0 ||
       payload.expiresAt <= Date.now()
     ) {
       return null
     }
 
-    return payload as SessionPayload
+    return { ...payload, sessionVersion } as SessionPayload
   } catch {
     return null
   }
@@ -80,7 +88,7 @@ export const getAuthenticatedUser = async (event: H3Event): Promise<SessionUser 
   const supabase = useSupabaseServer()
   const { data: user, error } = await supabase
     .from('admin_users')
-    .select('id, username, role, is_active')
+    .select('id, username, role, is_active, session_version')
     .eq('id', session.userId)
     .is('deleted_at', null)
     .maybeSingle()
@@ -89,7 +97,7 @@ export const getAuthenticatedUser = async (event: H3Event): Promise<SessionUser 
     throw createError({ statusCode: 500, statusMessage: '登录状态检查失败' })
   }
 
-  if (!user?.is_active) return null
+  if (!user?.is_active || user.session_version !== session.sessionVersion) return null
 
   return { userId: user.id, username: user.username, role: user.role }
 }

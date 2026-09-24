@@ -126,6 +126,7 @@ public.plans
 public.plan_checkins
 public.knowledge_categories
 public.knowledge_articles
+public.knowledge_article_revisions
 public.front_access_rules
 public.front_access_attempts
 public.food_orders
@@ -139,4 +140,4 @@ public.create_food_order
 public.get_plan_checkin_stats
 ```
 
-管理员密码只以哈希形式保存在 `public.admin_users`，角色为 `super` 或 `admin`。知识库图片保存在 Supabase Storage 的 `knowledge-images` 桶。
+管理员密码只以哈希形式保存在 `public.admin_users`，角色为 `super` 或 `admin`。文章在编辑、发布、下架或恢复前会将当前内容保存到 `public.knowledge_article_revisions`，历史记录只能在后台查看和恢复。知识库图片保存在 Supabase Storage 的 `knowledge-images` 桶。

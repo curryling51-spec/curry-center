@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   const supabase = useSupabaseServer()
   const { data: user, error } = await supabase
     .from('admin_users')
-    .select('id, username, password_hash, role, is_active')
+    .select('id, username, password_hash, role, is_active, session_version')
     .eq('username', username)
     .is('deleted_at', null)
     .maybeSingle()
@@ -38,11 +38,16 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, statusMessage: '登录状态保存失败' })
   }
 
-  const token = createSessionToken(config.sessionSecret, {
-    userId: user.id,
-    username: user.username,
-    role: user.role
-  })
+  const token = createSessionToken(
+    config.sessionSecret,
+    {
+      userId: user.id,
+      username: user.username,
+      role: user.role
+    },
+    undefined,
+    user.session_version
+  )
 
   setCookie(event, SESSION_COOKIE, token, {
     httpOnly: true,

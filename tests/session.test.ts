@@ -13,7 +13,8 @@ describe('admin session', () => {
 
     expect(verifySessionToken(secret, token)).toMatchObject({
       username: 'admin',
-      role: 'super'
+      role: 'super',
+      sessionVersion: 0
     })
   })
 

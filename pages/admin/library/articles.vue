@@ -39,7 +39,8 @@ const emptyForm = {
   category_id: '',
   title: '',
   slug: '',
-  content_markdown: ''
+  content_markdown: '',
+  published_at: ''
 }
 
 const articles = ref<Article[]>([])
@@ -84,6 +85,15 @@ const formatDateTime = (value: string) => new Intl.DateTimeFormat('zh-CN', {
 const categoryName = (categoryId: string) =>
   categories.value.find(category => category.id === categoryId)?.name || '原分类已删除'
 
+const toLocalDateTime = (value: string | null) => {
+  if (!value) return ''
+  const date = new Date(value)
+  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60_000)
+  return localDate.toISOString().slice(0, 16)
+}
+
+const toPublishedAt = (value: string) => value ? new Date(value).toISOString() : null
+
 const loadData = async () => {
   isLoading.value = true
   errorMessage.value = ''
@@ -118,7 +128,8 @@ const openEdit = (article: Article) => {
     category_id: article.category_id,
     title: article.title,
     slug: article.slug,
-    content_markdown: article.content_markdown
+    content_markdown: article.content_markdown,
+    published_at: toLocalDateTime(article.published_at)
   })
   errorMessage.value = ''
   isEditorOpen.value = true
@@ -205,7 +216,7 @@ const saveArticle = async () => {
   try {
     const options = {
       method: editingId.value ? 'PUT' as const : 'POST' as const,
-      body: { ...form }
+      body: { ...form, published_at: toPublishedAt(form.published_at) }
     }
     await $fetch(editingId.value
       ? `/api/admin/knowledge/articles/${editingId.value}`
@@ -349,6 +360,11 @@ onMounted(loadData)
                 <label>所属分类<select v-model="form.category_id" required><option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option></select></label>
               </div>
               <label>文章标识<input v-model="form.slug" maxlength="220" placeholder="留空时根据标题生成" /></label>
+              <label>
+                前台发布时间
+                <input v-model="form.published_at" type="datetime-local" />
+                <small>用于前台“发布于…”的时间；留空时会在首次发布时自动填入当前时间。</small>
+              </label>
 
               <div class="knowledge-editor-toolbar">
                 <strong>Markdown 正文</strong>

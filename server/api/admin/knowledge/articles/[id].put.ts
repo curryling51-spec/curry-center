@@ -15,6 +15,9 @@ export default defineEventHandler(async (event) => {
 
   if (readError) knowledgeDatabaseError(readError, '知识文章读取失败')
   if (!current) throw createError({ statusCode: 404, statusMessage: '知识文章不存在' })
+  if (current.status === 'published' && !payload.published_at) {
+    throw createError({ statusCode: 400, statusMessage: '已发布文章必须填写前台发布时间' })
+  }
   if (!articleContentChanged(current, payload)) return current
 
   const revisionId = await createArticleRevision(supabase, current, user, 'edit')

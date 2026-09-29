@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
 
   const { data, error } = await useSupabaseServer()
     .from('knowledge_articles')
-    .insert({ ...payload, status: 'draft', published_at: null })
+    .insert({ ...payload, status: 'draft' })
     .select('*')
     .single()
 

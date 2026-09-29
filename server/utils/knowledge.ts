@@ -11,6 +11,7 @@ export type KnowledgeArticlePayload = {
   title: string
   slug: string
   content_markdown: string
+  published_at: string | null
 }
 
 export const createKnowledgeSlug = (value: string): string => value
@@ -43,11 +44,19 @@ export const validateKnowledgeCategory = (payload: KnowledgeCategoryPayload): vo
 
 export const normalizeKnowledgeArticle = (body: Record<string, unknown>): KnowledgeArticlePayload => {
   const title = String(body.title || '').trim()
+  const publishedAtInput = String(body.published_at || '').trim()
+  const publishedAt = publishedAtInput ? new Date(publishedAtInput) : null
+
+  if (publishedAt && Number.isNaN(publishedAt.getTime())) {
+    throw createError({ statusCode: 400, statusMessage: '发布时间格式不正确' })
+  }
+
   return {
     category_id: String(body.category_id || '').trim(),
     title,
     slug: createKnowledgeSlug(String(body.slug || title)),
-    content_markdown: String(body.content_markdown || '')
+    content_markdown: String(body.content_markdown || ''),
+    published_at: publishedAt?.toISOString() || null
   }
 }
 

@@ -21,11 +21,14 @@ export default defineEventHandler(async (event) => {
 
   const changeType = status === 'published' ? 'publish' : 'unpublish'
   const revisionId = await createArticleRevision(supabase, current, user, changeType)
+  const publishedAt = status === 'published'
+    ? current.published_at || new Date().toISOString()
+    : current.published_at
   const { data, error } = await supabase
     .from('knowledge_articles')
     .update({
       status,
-      published_at: status === 'published' ? new Date().toISOString() : null,
+      published_at: publishedAt,
       updated_at: new Date().toISOString()
     })
     .eq('id', id)

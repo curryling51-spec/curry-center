@@ -52,8 +52,9 @@ export const rollbackArticleRevision = async (
 
 export const articleContentChanged = (
   article: ArticleSnapshot,
-  payload: Pick<ArticleSnapshot, 'category_id' | 'title' | 'slug' | 'content_markdown'>
+  payload: Pick<ArticleSnapshot, 'category_id' | 'title' | 'slug' | 'content_markdown' | 'published_at'>
 ): boolean => article.category_id !== payload.category_id
   || article.title !== payload.title
   || article.slug !== payload.slug
   || article.content_markdown !== payload.content_markdown
+  || article.published_at !== payload.published_at

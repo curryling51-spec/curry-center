@@ -96,6 +96,8 @@ npm run deploy:prod
 
 访问规则在后台 `/admin/access` 配置。每条规则有独立 Key 和图案，图案只以 `scrypt` 哈希保存。连续失败 5 次后，当前 Key 与来源 IP 锁定 24 小时；验证成功后的签名 Cookie 保留 7 天。
 
+个人中心位于 `/profile`，目前提供 `/profile/ordering-food` 在线点菜。两个页面沿用原点菜规则 `orderingfood` 的图案和验证状态，旧地址 `/ordering-food` 会跳转到新地址。后续个人功能可继续放在 `/profile/` 下，并按需声明访问规则。
+
 需要验证的页面声明规则 Key：
 
 ```ts

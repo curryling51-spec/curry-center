@@ -110,7 +110,7 @@ onMounted(loadOrders)
   <div>
     <section class="admin-page-heading">
       <div><h2>点菜记录</h2><p>{{ pendingCount }} 单待处理，共 {{ total }} 单</p></div>
-      <NuxtLink class="admin-secondary-action" to="/ordering-food" target="_blank">打开点菜页</NuxtLink>
+      <NuxtLink class="admin-secondary-action" to="/profile/ordering-food" target="_blank">打开点菜页</NuxtLink>
     </section>
 
     <p v-if="errorMessage" class="admin-alert">{{ errorMessage }}</p>

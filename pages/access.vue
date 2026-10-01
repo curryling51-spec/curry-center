@@ -152,7 +152,7 @@ onMounted(async () => {
       attemptsRemaining: number
       lockedUntil: string | null
     }>('/api/access/status', { query: { key: accessKey.value } })
-    ruleName.value = result.name
+    ruleName.value = accessKey.value === 'orderingfood' ? '个人中心' : result.name
     attemptsRemaining.value = result.attemptsRemaining
     lockedUntil.value = result.lockedUntil
     if (result.verified) await navigateTo(destination.value)

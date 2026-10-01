@@ -37,7 +37,7 @@ useHead({
           <NuxtLink class="button secondary" to="/admin">进入后台</NuxtLink>
           <NuxtLink class="button secondary" to="/games">小游戏</NuxtLink>
           <NuxtLink class="button secondary" to="/library">个人知识库</NuxtLink>
-          <NuxtLink class="button secondary" to="/ordering-food">在线点菜</NuxtLink>
+          <NuxtLink class="button secondary" to="/profile">个人中心</NuxtLink>
         </div>
       </div>
 
